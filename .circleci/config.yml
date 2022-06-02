@@ -1,26 +1,25 @@
-version: 1.0
+version: 2.1
+
 jobs:
-  run_tests:
+  build:
+    working_directory: ~/Circle-CI
     docker:
-      -image: cimg/python:3.8
+      - image: "circleci/python:3.6.4"
     steps:
       - checkout
-      - run:
-          name: Installing Python Dependencies
-          command: |
-            echo 'export PATH=~$PATH:~/.local/bin' >> $BASH_ENV && source $BASH_ENV
-            pip install --user -r requirements.txt
-      - run:
-          name: Run unit tests
-          command: |
-            pytest --junitxml=test-reports/junit.xml --html=test-reports/pytest_reports.html --self-contained-html
-      - store_test_results:
-          path: test-reports
-      - store_artifacts:
-          path: test-reports
+      - run: python3 sample.py
+  test:
+    working_directory: ~/Circle-CI
+    docker:
+      - image: "circleci/python:3.6.4"
+    steps:
+      - checkout
+      - run: python3 test-sample.py
+
 workflows:
-  build_test:
+  build_and_test:
     jobs:
-      - run_tests
-
-
+      - build
+      - test:
+          requires:
+            - build
